@@ -1,0 +1,2991 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistem Mapping SNOMED-CT</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url('gambar rs esa unggul.png') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            max-width: 1000px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            position: relative;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-left {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #1e8449;
+            position: relative;
+        }
+
+        .hospital-icon {
+            display: none;
+        }
+
+        .hospital-icon {
+            font-size: 120px;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+            filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .login-left h1 {
+            font-size: 2.2em;
+            margin-bottom: 15px;
+            text-align: center;
+            line-height: 1.3;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .login-left p {
+            text-align: center;
+            font-size: 1.1em;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+
+        .login-right {
+            padding: 60px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .login-header h2 {
+            color: #1e8449;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .login-header p {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 0.95em;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            display: none;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s;
+            background: #f8f9fa;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #27ae60;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.1);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #1e8449 0%, #27ae60 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(39, 174, 96, 0.4);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .help-text {
+            text-align: center;
+            margin-top: 25px;
+            padding: 15px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 8px;
+            font-size: 0.9em;
+            color: #856404;
+        }
+
+        .help-text strong {
+            color: #664d03;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 18px 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            display: none;
+            align-items: center;
+            gap: 12px;
+            z-index: 9999;
+            animation: slideInRight 0.5s ease-out;
+            min-width: 320px;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .notification.show {
+            display: flex;
+        }
+
+        .notification.success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 5px solid #28a745;
+        }
+
+        .notification.error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 5px solid #dc3545;
+        }
+
+        .notification-icon {
+            font-size: 1.5em;
+        }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-content strong {
+            display: block;
+            margin-bottom: 3px;
+            font-size: 1.05em;
+        }
+
+        .notification-close {
+            cursor: pointer;
+            font-size: 1.3em;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+        }
+
+        .app-container {
+            display: none;
+            background: white;
+            min-height: 100vh;
+        }
+
+        .app-container.show {
+            display: block;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e8449 0%, #27ae60 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .user-info {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .user-info span {
+            font-size: 1em;
+        }
+
+        .btn-logout {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 8px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            background: white;
+            color: #27ae60;
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            border: 2px solid #e0e0e0;
+            background: white;
+            font-size: 14px;
+            border-radius: 8px;
+            color: #333;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+            border-color: #27ae60;
+        }
+
+        .tab.active {
+            background: #27ae60;
+            color: white;
+            border-color: #27ae60;
+        }
+
+        .tab-content {
+            display: none;
+            width: 100%;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .welcome-card {
+            background: linear-gradient(135deg, #1e8449 0%, #27ae60 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        .welcome-card h2 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .stat-card .icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .stat-card h3 {
+            font-size: 2.5em;
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+
+        .stat-card p {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        @media (max-width: 768px) {
+            .login-container {
+                grid-template-columns: 1fr;
+            }
+
+            .login-left {
+                padding: 40px 30px;
+            }
+
+            .login-left h1 {
+                font-size: 1.8em;
+            }
+
+            .hospital-icon {
+                font-size: 80px;
+            }
+
+            .login-right {
+                padding: 40px 30px;
+            }
+
+            .notification {
+                left: 20px;
+                right: 20px;
+                min-width: auto;
+            }
+
+            .user-info {
+                position: relative;
+                top: auto;
+                right: auto;
+                justify-content: center;
+                margin-top: 15px;
+            }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab {
+                width: 100%;
+            }
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .action-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        }
+
+        .action-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 15px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            color: white;
+        }
+
+        .action-card h3 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1.2em;
+        }
+
+        .action-card p {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .chart-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            height: 300px;
+        }
+
+        .activity-list {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s;
+        }
+
+        .activity-item:hover {
+            background: #f8f9fa;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-content h4 {
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 1em;
+        }
+
+        .activity-content p {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .activity-content .time {
+            color: #999;
+            font-size: 0.85em;
+        }
+
+        .activity-status {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .activity-status.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .activity-status.pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .activity-status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .ranking-list {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s;
+        }
+
+        .ranking-item:hover {
+            background: #f8f9fa;
+        }
+
+        .ranking-item:last-child {
+            border-bottom: none;
+        }
+
+        .rank {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .rank-content {
+            flex: 1;
+        }
+
+        .rank-content h4 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress {
+            height: 100%;
+            transition: width 1s ease;
+        }
+
+        .count {
+            color: #666;
+            font-size: 0.85em;
+        }
+
+        .info-cards {
+            display: grid;
+            gap: 15px;
+        }
+
+        .info-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .info-card h3 {
+            color: #333;
+            font-size: 1em;
+            margin-bottom: 10px;
+        }
+
+        .info-card p {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .system-status {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .status-indicator.online {
+            background: #27ae60;
+            box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.2);
+        }
+
+        .status-indicator.warning {
+            background: #f39c12;
+            box-shadow: 0 0 0 3px rgba(243, 156, 18, 0.2);
+        }
+
+        .status-indicator.offline {
+            background: #e74c3c;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.2);
+        }
+
+        .status-item span:nth-child(2) {
+            flex: 1;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .status-text {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border-left: 4px solid #27ae60;
+        }
+
+        .form-section h3 {
+            color: #27ae60;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #27ae60;
+            box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e8449 0%, #27ae60 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 13px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            margin-right: 5px;
+            transition: all 0.2s;
+        }
+
+        .btn-view {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-view:hover {
+            background: #2980b9;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .search-container {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #27ae60;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 400px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-item {
+            padding: 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s;
+        }
+
+        .search-item:hover {
+            background: #f8f9fa;
+        }
+
+        .search-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-item strong {
+            color: #27ae60;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1.05em;
+        }
+
+        .search-item small {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .search-item .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table thead {
+            background: linear-gradient(135deg, #1e8449 0%, #27ae60 100%);
+        }
+
+        table th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: white;
+        }
+
+        table td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        table tbody tr:hover {
+            background: #f8f9fa;
+        }
+
+        table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+        
+        .badge-finding { background: #d1ecf1; color: #0c5460; }
+        .badge-disorder { background: #f8d7da; color: #721c24; }
+        .badge-procedure { background: #d4edda; color: #155724; }
+        .badge-substance { background: #fff3cd; color: #856404; }
+        .badge-body { background: #e2e3e5; color: #383d41; }
+        .badge-qualifier { background: #d6d8db; color: #383d41; }
+
+        .char-counter {
+            font-size: 12px;
+            color: #666;
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            color: #666;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+
+        .empty-state p {
+            color: #999;
+            font-size: 0.95em;
+        }
+    </style>
+</head>
+<body>
+    <div id="notification" class="notification">
+        <span class="notification-icon" id="notifIcon">✓</span>
+        <div class="notification-content">
+            <strong id="notifTitle">Berhasil</strong>
+            <span id="notifMessage">Login berhasil!</span>
+        </div>
+        <span class="notification-close" onclick="closeNotification()">×</span>
+    </div>
+
+    <div id="loginPage" class="login-container">
+        <div class="login-left">
+            <div class="hospital-icon">🏥</div>
+            <h1>Aplikasi Mapping SNOMED-CT</h1>
+            <p>untuk Resume Medis<br><strong>RS Esa Unggul</strong></p>
+        </div>
+
+        <div class="login-right">
+            <div class="login-header">
+                <h2>🔐 Login</h2>
+                <p>Masuk ke sistem mapping SNOMED-CT</p>
+            </div>
+
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">👤</span>
+                        <input type="text" id="username" name="username" required placeholder="Masukkan username">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" id="password" name="password" required placeholder="Masukkan password">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-login">🚀 Login</button>
+            </form>
+
+            <div class="help-text">
+                <strong>⚠️ Perhatian:</strong><br>
+                Jika Anda kesulitan melakukan login, silahkan hubungi <strong>Tim IT</strong>
+            </div>
+        </div>
+    </div>
+
+    <div id="mainApp" class="app-container">
+        <div class="header">
+            <h1>🏥 Sistem Mapping SNOMED-CT</h1>
+            <p>Sistem Pemetaan Kode SNOMED-CT untuk Resume Medis - RS Esa Unggul</p>
+            <div class="user-info">
+                <span>👤 <strong id="loggedUser">Admin</strong></span>
+                <button class="btn-logout" onclick="handleLogout()">🚪 Logout</button>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="dashboard" onclick="switchTab('dashboard')">📊 Dashboard</button>
+            <button class="tab" data-tab="pendaftaran" onclick="switchTab('pendaftaran')">👤 Pendaftaran Pasien</button>
+            <button class="tab" data-tab="data_pasien" onclick="switchTab('data_pasien')">📋 Data Pasien</button>
+            <button class="tab" data-tab="input_snomed" onclick="switchTab('input_snomed')">🔢 Input Kode SNOMED-CT</button>
+            <button class="tab" data-tab="input" onclick="switchTab('input')">📝 Input Resume</button>
+            <button class="tab" data-tab="mapping" onclick="switchTab('mapping')">🔍 Pencarian SNOMED</button>
+            <button class="tab" data-tab="database" onclick="switchTab('database')">💾 Database</button>
+        </div>
+
+        <div id="dashboard" class="tab-content active">
+            <div class="content">
+                <div class="welcome-card">
+                    <h2>Selamat Datang, <span id="welcomeUser">Admin</span>! 👋</h2>
+                    <p>Sistem Mapping SNOMED-CT RS Esa Unggul siap digunakan</p>
+                    <p style="margin-top: 10px; font-size: 0.95em; opacity: 0.9;">
+                        <span id="currentDate"></span> | <span id="currentTime"></span>
+                    </p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card" style="border-top: 4px solid #3498db;">
+                        <div class="icon">📋</div>
+                        <h3 id="totalResume">0</h3>
+                        <p>Total Resume Medis</p>
+                        <div style="margin-top: 10px; font-size: 0.85em; color: #27ae60;" id="resumeGrowth">
+                            Belum ada data
+                        </div>
+                    </div>
+
+                    <div class="stat-card" style="border-top: 4px solid #27ae60;">
+                        <div class="icon">✅</div>
+                        <h3 id="totalMapped">0</h3>
+                        <p>Berhasil di-Mapping</p>
+                        <div style="margin-top: 10px; font-size: 0.85em; color: #27ae60;" id="mappingRate">
+                            0% completion rate
+                        </div>
+                    </div>
+
+                    <div class="stat-card" style="border-top: 4px solid #9b59b6;">
+                        <div class="icon">🔢</div>
+                        <h3 id="totalSnomedCodes">0</h3>
+                        <p>Kode SNOMED-CT</p>
+                        <div style="margin-top: 10px; font-size: 0.85em; color: #666;" id="snomedStatus">
+                            Belum ada kode
+                        </div>
+                    </div>
+
+                    <div class="stat-card" style="border-top: 4px solid #e74c3c;">
+                        <div class="icon">⚠️</div>
+                        <h3 id="pendingReview">0</h3>
+                        <p>Perlu Review</p>
+                        <div style="margin-top: 10px; font-size: 0.85em; color: #e74c3c;" id="reviewStatus">
+                            Tidak ada yang pending
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <h2 style="color: #333; margin-bottom: 20px; font-size: 1.5em;">⚡ Aksi Cepat</h2>
+                    <div class="quick-actions">
+                        <div class="action-card" onclick="switchTab('input')">
+                            <div class="action-icon" style="background: linear-gradient(135deg, #3498db, #2980b9);">📝</div>
+                            <h3>Input Resume Baru</h3>
+                            <p>Tambah data resume medis pasien baru</p>
+                        </div>
+
+                        <div class="action-card" onclick="switchTab('mapping')">
+                            <div class="action-icon" style="background: linear-gradient(135deg, #9b59b6, #8e44ad);">🔍</div>
+                            <h3>Cari Kode SNOMED</h3>
+                            <p>Pencarian database SNOMED-CT</p>
+                        </div>
+
+                        <div class="action-card" onclick="switchTab('database')">
+                            <div class="action-icon" style="background: linear-gradient(135deg, #27ae60, #229954);">💾</div>
+                            <h3>Lihat Database</h3>
+                            <p>Akses semua data yang tersimpan</p>
+                        </div>
+
+                        <div class="action-card" onclick="alert('Fitur export akan segera hadir')">
+                            <div class="action-icon" style="background: linear-gradient(135deg, #e67e22, #d35400);">📊</div>
+                            <h3>Export Laporan</h3>
+                            <p>Download data dalam format Excel/PDF</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <h2 style="color: #333; margin-bottom: 20px; font-size: 1.5em;">📈 Aktivitas Mapping (7 Hari Terakhir)</h2>
+                    <div class="chart-container">
+                        <canvas id="activityChart"></canvas>
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <h2 style="color: #333; margin-bottom: 20px; font-size: 1.5em;">🕒 Aktivitas Terbaru</h2>
+                    <div class="activity-list" id="activityList">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">📭</div>
+                            <h3>Belum Ada Aktivitas</h3>
+                            <p>Aktivitas akan muncul setelah Anda mulai menggunakan sistem</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <div class="grid-2">
+                        <div>
+                            <h2 style="color: #333; margin-bottom: 20px; font-size: 1.5em;">🏆 Top 5 Diagnosa</h2>
+                            <div class="ranking-list" id="topDiagnoses">
+                                <div class="empty-state">
+                                    <div class="empty-state-icon">🏆</div>
+                                    <h3>Belum Ada Data Diagnosa</h3>
+                                    <p>Ranking akan muncul setelah ada data resume medis</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h2 style="color: #333; margin-bottom: 20px; font-size: 1.5em;">📊 Statistik Mapping</h2>
+                            <div class="info-cards">
+                                <div class="info-card" style="border-left: 4px solid #3498db;">
+                                    <h3>Rata-rata Waktu Mapping</h3>
+                                    <div style="font-size: 2em; color: #3498db; margin: 10px 0;" id="avgMappingTime">-</div>
+                                    <p>Per resume medis</p>
+                                </div>
+
+                                <div class="info-card" style="border-left: 4px solid #27ae60;">
+                                    <h3>Akurasi Mapping</h3>
+                                    <div style="font-size: 2em; color: #27ae60; margin: 10px 0;" id="mappingAccuracy">-</div>
+                                    <p>Kode valid & sesuai</p>
+                                </div>
+
+                                <div class="info-card" style="border-left: 4px solid #9b59b6;">
+                                    <h3>Kode Paling Sering</h3>
+                                    <div style="font-size: 1.5em; color: #9b59b6; margin: 10px 0;" id="mostUsedCode">-</div>
+                                    <p id="mostUsedCodeName">Belum ada data</p>
+                                </div>
+
+                                <div class="info-card" style="border-left: 4px solid #e67e22;">
+                                    <h3>Produktivitas Bulan Ini</h3>
+                                    <div style="font-size: 2em; color: #e67e22; margin: 10px 0;" id="monthlyProductivity">0</div>
+                                    <p>resume medis</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <h2 style="color: #333; margin-bottom: 20px; font-size: 1.5em;">🔧 Status Sistem</h2>
+                    <div class="system-status">
+                        <div class="status-item">
+                            <span class="status-indicator online"></span>
+                            <span>Database SNOMED-CT</span>
+                            <span class="status-text">Online</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-indicator online"></span>
+                            <span>Server Aplikasi</span>
+                            <span class="status-text">Online</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-indicator online"></span>
+                            <span>Storage Database</span>
+                            <span class="status-text" id="storageUsage">0% Terpakai</span>
+                        </div>
+                        <div class="status-item">
+                            <span class="status-indicator warning"></span>
+                            <span>Backup Terakhir</span>
+                            <span class="status-text">Belum pernah backup</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="pendaftaran" class="tab-content">
+            <div class="content">
+                <h2 style="margin-bottom: 20px;">👤 Pendaftaran Pasien</h2>
+
+                <div class="alert alert-info">
+                    📋 Masukkan data pasien baru ke dalam sistem. Semua field yang ditandai (*) wajib diisi.
+                </div>
+
+                <form id="pendaftaranForm" onsubmit="handlePendaftaran(event)">
+                    <div class="form-section">
+                        <h3>📋 Data Administratif</h3>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Nomor Rekam Medis *</label>
+                                <input type="text" id="noRM_pendaftaran" required placeholder="Contoh: RM-2024-001">
+                            </div>
+                            <div class="form-group">
+                                <label>Tanggal Pendaftaran *</label>
+                                <input type="datetime-local" id="tanggalPendaftaran" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>👤 Data Demografi</h3>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Nama Lengkap *</label>
+                                <input type="text" id="namaLengkap" required placeholder="Nama lengkap pasien">
+                            </div>
+                            <div class="form-group">
+                                <label>Jenis Kelamin *</label>
+                                <select id="jenisKelamin_pendaftaran" required>
+                                    <option value="">Pilih...</option>
+                                    <option value="Laki-laki">Laki-laki</option>
+                                    <option value="Perempuan">Perempuan</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Tanggal Lahir *</label>
+                                <input type="date" id="tanggalLahir" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Telepon</label>
+                                <input type="tel" id="telepon" placeholder="Contoh: 08123456789">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Alamat</label>
+                            <textarea id="alamat" placeholder="Alamat lengkap pasien"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" id="email" placeholder="Contoh: pasien@email.com">
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>🏥 Data Medis Dasar</h3>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Golongan Darah</label>
+                                <select id="golonganDarah">
+                                    <option value="">Pilih...</option>
+                                    <option value="A">A</option>
+                                    <option value="B">B</option>
+                                    <option value="AB">AB</option>
+                                    <option value="O">O</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Rhesus</label>
+                                <select id="rhesus">
+                                    <option value="">Pilih...</option>
+                                    <option value="+">+</option>
+                                    <option value="-">-</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Riwayat Penyakit</label>
+                            <textarea id="riwayatPenyakit" placeholder="Contoh: Hipertensi, Diabetes, dll"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Alergi</label>
+                            <textarea id="alergi" placeholder="Contoh: Obat tertentu, makanan, dll"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Obat Rutin</label>
+                            <textarea id="obatRutin" placeholder="Contoh: Obat hipertensi, insulin, dll"></textarea>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 30px; display: flex; gap: 10px;">
+                        <button type="submit" class="btn btn-primary">💾 Simpan Data Pasien</button>
+                        <button type="reset" class="btn btn-secondary">🔄 Reset Form</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="data_pasien" class="tab-content">
+            <div class="content">
+                <h2 style="margin-bottom: 20px;">📋 Data Pasien</h2>
+
+                <div class="alert alert-info">
+                    👥 Kelola dan lihat data pasien yang telah terdaftar dalam sistem.
+                </div>
+
+                <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+                    <button class="btn btn-primary" onclick="refreshDataPasien()">🔄 Refresh Data</button>
+                    <button class="btn btn-success" onclick="exportDataPasien()">📗 Export ke Excel</button>
+                </div>
+
+                <div class="table-container">
+                    <table id="dataPasienTable">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>No. RM</th>
+                                <th>Nama Pasien</th>
+                                <th>Jenis Kelamin</th>
+                                <th>Usia</th>
+                                <th>Telepon</th>
+                                <th>Tanggal Daftar</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataPasienBody">
+                            <tr>
+                                <td colspan="8" style="text-align: center; padding: 40px;">
+                                    <div class="empty-state">
+                                        <div class="empty-state-icon">👥</div>
+                                        <h3>Belum Ada Data Pasien</h3>
+                                        <p>Silakan tambahkan pasien baru di menu Pendaftaran Pasien</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="input_snomed" class="tab-content">
+            <div class="content">
+                <h2 style="margin-bottom: 20px;">🔢 Input Kode SNOMED-CT</h2>
+
+                <div class="alert alert-info">
+                    🏷️ Input dan kelola kode SNOMED-CT untuk diagnosis, prosedur, dan temuan klinis.
+                </div>
+
+                <form id="snomedForm" onsubmit="handleInputSNOMED(event)">
+                    <div class="form-section">
+                        <h3>📝 Input Kode Manual</h3>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Kode SNOMED-CT *</label>
+                                <input type="text" id="kodeSNOMED" required placeholder="Contoh: 38341003">
+                            </div>
+                        <div class="form-group">
+                            <label>Kategori *</label>
+                            <select id="kategoriSNOMED" required>
+                                <option value="">Pilih Kategori</option>
+                                <option value="finding">Clinical Finding</option>
+                                <option value="disorder">Disorder</option>
+                                <option value="procedure">Procedure</option>
+                                <option value="therapy">Therapy</option>
+                                <option value="substance">Substance</option>
+                                <option value="body">Body Structure</option>
+                                <option value="qualifier">Qualifier Value</option>
+                            </select>
+                        </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Display Name (English) *</label>
+                            <input type="text" id="displayEnglish" required placeholder="Contoh: Hypertension (disorder)">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Display Name (Indonesia)</label>
+                            <input type="text" id="displayIndonesia" placeholder="Contoh: Hipertensi">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Deskripsi</label>
+                            <textarea id="deskripsiSNOMED" placeholder="Deskripsi tambahan tentang kode ini"></textarea>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 30px; display: flex; gap: 10px;">
+                        <button type="submit" class="btn btn-primary">💾 Simpan Kode SNOMED-CT</button>
+                        <button type="reset" class="btn btn-secondary">🔄 Reset Form</button>
+                    </div>
+                </form>
+
+                <div style="margin-top: 40px;">
+                    <h3 style="margin-bottom: 20px;">📚 Kode SNOMED-CT yang Tersimpan</h3>
+                    <div class="table-container">
+                        <table id="snomedTable">
+                            <thead>
+                                <tr>
+                                    <th>Kode</th>
+                                    <th>Display (English)</th>
+                                    <th>Display (Indonesia)</th>
+                                    <th>Kategori</th>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="snomedTableBody">
+                                <tr>
+                                    <td colspan="5" style="text-align: center; padding: 40px;">
+                                        <div class="empty-state">
+                                            <div class="empty-state-icon">🔢</div>
+                                            <h3>Belum Ada Kode SNOMED-CT</h3>
+                                            <p>Silakan tambahkan kode baru menggunakan form di atas</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="input" class="tab-content">
+            <div class="content">
+                <h2 style="margin-bottom: 20px;">📝 Input Resume Medis Pasien</h2>
+                
+                <div class="alert alert-info">
+                    📋 Masukkan data resume medis pasien. Sistem akan otomatis menyimpan dan memetakan ke kode SNOMED-CT.
+                </div>
+
+                <form id="resumeForm" onsubmit="handleSubmitResume(event)">
+                    <div class="form-section">
+                        <h3>📋 Data Administratif</h3>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Pilih Pasien Terdaftar *</label>
+                                <select id="patientSelect" required onchange="onPatientSelect()">
+                                    <option value="">Pilih pasien...</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Tanggal Masuk *</label>
+                                <input type="datetime-local" id="tanggalMasuk" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>👤 Data Person</h3>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Nomor Rekam Medis *</label>
+                                <input type="text" id="noRM" required placeholder="Otomatis terisi" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label>Nama Pasien *</label>
+                                <input type="text" id="namaPasien" required placeholder="Otomatis terisi" readonly>
+                            </div>
+                        </div>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Jenis Kelamin *</label>
+                                <select id="jenisKelamin" required disabled>
+                                    <option value="">Otomatis terisi</option>
+                                    <option value="Laki-laki">Laki-laki</option>
+                                    <option value="Perempuan">Perempuan</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Usia *</label>
+                                <input type="number" id="usia" required placeholder="Otomatis terisi" readonly>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Status Kehamilan (jika perempuan)</label>
+                            <input type="text" id="statusKehamilan" placeholder="Contoh: Hamil 34 minggu">
+                            <div style="margin-top: 8px;">
+                                <label style="font-size: 0.9em; color: #666;">Kode SNOMED-CT untuk Status Kehamilan</label>
+                                <select id="statusKehamilanSNOMED" onchange="onSNOMEDSelectStatusKehamilan()">
+                                    <option value="">Pilih kode SNOMED-CT...</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>🩺 Data Problem/Keluhan</h3>
+                        <div class="form-group">
+                            <label>Keluhan Utama *</label>
+                            <textarea id="keluhanUtama" required placeholder="Contoh: Pendarahan dari jalan lahir sejak 2 jam yang lalu"></textarea>
+                            <div style="margin-top: 8px;">
+                                <label style="font-size: 0.9em; color: #666;">Kode SNOMED-CT untuk Keluhan Utama</label>
+                                <select id="keluhanUtamaSNOMED" onchange="onSNOMEDSelectKeluhanUtama()">
+                                    <option value="">Pilih kode SNOMED-CT...</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Keluhan Tambahan</label>
+                            <textarea id="keluhanTambahan" placeholder="Contoh: Nyeri perut bagian bawah, mual, pusing"></textarea>
+                            <div style="margin-top: 8px;">
+                                <label style="font-size: 0.9em; color: #666;">Kode SNOMED-CT untuk Keluhan Tambahan</label>
+                                <select id="keluhanTambahanSNOMED" onchange="onSNOMEDSelectKeluhanTambahan()">
+                                    <option value="">Pilih kode SNOMED-CT...</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Riwayat Penyakit</label>
+                            <textarea id="riwayatPenyakitResume" placeholder="Contoh: Anemia selama kehamilan, Hipertensi"></textarea>
+                            <div style="margin-top: 8px;">
+                                <label style="font-size: 0.9em; color: #666;">Kode SNOMED-CT untuk Riwayat Penyakit</label>
+                                <select id="riwayatPenyakitSNOMED" onchange="onSNOMEDSelectRiwayatPenyakit()">
+                                    <option value="">Pilih kode SNOMED-CT...</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Kondisi Saat Datang</label>
+                            <input type="text" id="kondisiDatang" placeholder="Contoh: Lemah dan pucat">
+                            <div style="margin-top: 8px;">
+                                <label style="font-size: 0.9em; color: #666;">Kode SNOMED-CT untuk Kondisi Saat Datang</label>
+                                <select id="kondisiDatangSNOMED" onchange="onSNOMEDSelectKondisiDatang()">
+                                    <option value="">Pilih kode SNOMED-CT...</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>⚕️ Tindakan dan Hasil</h3>
+                        <div class="form-group">
+                            <label>Tindakan yang Dilakukan</label>
+                            <textarea id="tindakan" placeholder="Contoh: Pemasangan infus, pemberian cairan, suntikan penguat kandungan"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Hasil Tindakan</label>
+                            <textarea id="hasilTindakan" placeholder="Contoh: Perdarahan berkurang, kondisi mulai stabil"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>🔬 Diagnosa</h3>
+                        <!-- INTEGRATION: SNOMED-CT Master Data Selection -->
+                        <!-- Load SNOMED codes from master data (Input Kode SNOMED-CT module) -->
+                        <div class="form-group">
+                            <label>Pilih Kode SNOMED-CT untuk Diagnosa *</label>
+                            <select id="snomedSelect" required onchange="onSNOMEDSelect()">
+                                <option value="">Pilih kode SNOMED-CT...</option> 
+                                
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Diagnosa Utama *</label>
+                            <input type="text" id="diagnosaUtama" required placeholder="Otomatis terisi dari SNOMED-CT" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Diagnosa Sekunder</label>
+                            <textarea id="diagnosaSekunder" placeholder="Contoh: Anemia gravidarum"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>💊 Obat-obatan</h3>
+                        <div class="form-group">
+                            <label>Obat yang Diberikan</label>
+                            <textarea id="obat" placeholder="Contoh: Infus RL 500ml, Transfusi darah, Penguat kandungan"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>📋 Rencana Tindak Lanjut</h3>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Rencana Tindak Lanjut</label>
+                                <select id="rencana">
+                                    <option value="">Pilih...</option>
+                                    <option value="Rawat inap">Rawat inap</option>
+                                    <option value="Rawat jalan">Rawat jalan</option>
+                                    <option value="Rujuk">Rujuk ke RS lain</option>
+                                    <option value="Pulang">Pulang</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Prognosis</label>
+                                <select id="prognosis">
+                                    <option value="">Pilih...</option>
+                                    <option value="Baik">Baik</option>
+                                    <option value="Cukup">Cukup</option>
+                                    <option value="Tidak baik">Tidak baik</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 30px; display: flex; gap: 10px;">
+                        <button type="submit" class="btn btn-primary">💾 Simpan dan Mapping Otomatis</button>
+                        <button type="reset" class="btn btn-secondary">🔄 Reset Form</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="mapping" class="tab-content">
+            <div class="content">
+                <h2 style="margin-bottom: 20px;">🔍 Pencarian Database SNOMED-CT</h2>
+
+                <div class="alert alert-info">
+                    💡 Cari kode SNOMED-CT berdasarkan istilah medis. Sistem mendukung pencarian dalam Bahasa Indonesia dan Inggris.
+                </div>
+
+                <div class="search-container">
+                    <div class="form-group search-box">
+                        <label>Cari Istilah Medis</label>
+                        <input type="text" id="searchInput" placeholder="Ketik diagnosis, prosedur, obat, atau gejala..." oninput="searchSNOMED()">
+                        <div class="search-results" id="searchResults"></div>
+                    </div>
+
+                    <div class="grid-2" style="margin-top: 20px;">
+                        <div class="form-group">
+                            <label>Filter berdasarkan Kategori</label>
+                            <select id="categoryFilter" onchange="searchSNOMED()">
+                                <option value="">Semua Kategori</option>
+                                <option value="finding">Clinical Finding</option>
+                                <option value="disorder">Disorder</option>
+                                <option value="procedure">Procedure</option>
+                                <option value="therapy">Therapy</option>
+                                <option value="substance">Substance</option>
+                                <option value="body">Body Structure</option>
+                                <option value="qualifier">Qualifier Value</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Bahasa</label>
+                            <select id="languageFilter">
+                                <option value="">Semua Bahasa</option>
+                                <option value="english">English</option>
+                                <option value="indonesia">Bahasa Indonesia</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stats-grid" style="margin-top: 30px;">
+                    <div class="stat-card" style="border-top: 4px solid #3498db;">
+                        <div class="icon">🔎</div>
+                        <h3 id="countFindings">0</h3>
+                        <p>Clinical Findings</p>
+                    </div>
+                    <div class="stat-card" style="border-top: 4px solid #9b59b6;">
+                        <div class="icon">⚕️</div>
+                        <h3 id="countProcedures">0</h3>
+                        <p>Procedures</p>
+                    </div>
+                    <div class="stat-card" style="border-top: 4px solid #e74c3c;">
+                        <div class="icon">🏥</div>
+                        <h3 id="countDisorders">0</h3>
+                        <p>Disorders</p>
+                    </div>
+                    <div class="stat-card" style="border-top: 4px solid #27ae60;">
+                        <div class="icon">💊</div>
+                        <h3 id="countSubstances">0</h3>
+                        <p>Substances</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="database" class="tab-content">
+            <div class="content">
+                <h2 style="margin-bottom: 20px;">💾 Database Resume Medis yang Tersimpan</h2>
+                
+                <div class="alert alert-success" id="saveAlert" style="display: none;">
+                    ✅ Data berhasil disimpan ke database!
+                </div>
+
+                <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+                    <button class="btn btn-primary" onclick="refreshDatabase()">🔄 Refresh Data</button>
+                    <button class="btn btn-success" onclick="exportToExcel()">📗 Export ke Excel</button>
+                    <button class="btn btn-secondary" onclick="exportToPDF()">📕 Export ke PDF</button>
+                </div>
+
+                <div class="table-container">
+                    <table id="databaseTable">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>No. RM</th>
+                                <th>Nama Pasien</th>
+                                <th>Tanggal</th>
+                                <th>Diagnosa Utama</th>
+                                <th>Status Mapping</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="databaseBody">
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 40px;">
+                                    <div class="empty-state">
+                                        <div class="empty-state-icon">💾</div>
+                                        <h3>Belum Ada Resume Medis</h3>
+                                        <p>Silakan tambahkan resume baru di menu Input Resume</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const validUsers = [
+            { username: 'admin', password: 'admin123', name: 'Administrator' },
+            { username: 'dokter', password: 'dokter123', name: 'Dr. Ahmad' },
+            { username: 'perawat', password: 'perawat123', name: 'Suster Rina' }
+        ];
+
+        let currentUser = null;
+        let activityLog = [];
+
+        window.addEventListener('DOMContentLoaded', function() {
+            const loggedUser = localStorage.getItem('loggedUser');
+            if (loggedUser) {
+                const userData = JSON.parse(loggedUser);
+                showMainApp(userData);
+            }
+        });
+
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            const user = validUsers.find(u => u.username === username && u.password === password);
+
+            if (user) {
+                localStorage.setItem('loggedUser', JSON.stringify(user));
+                showNotification('success', 'Login Berhasil!', `Selamat datang, ${user.name}`);
+                
+                setTimeout(() => {
+                    showMainApp(user);
+                }, 1500);
+            } else {
+                showNotification('error', 'Login Gagal!', 'Username atau password salah. Silakan coba lagi.');
+            }
+        }
+
+        function showMainApp(user) {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('mainApp').classList.add('show');
+            document.getElementById('loggedUser').textContent = user.name;
+            document.getElementById('welcomeUser').textContent = user.name;
+            currentUser = user;
+            initializeDashboard();
+            loadActivityLog();
+        }
+
+        function handleLogout() {
+            if (confirm('Apakah Anda yakin ingin logout?')) {
+                localStorage.removeItem('loggedUser');
+                document.getElementById('mainApp').classList.remove('show');
+                document.getElementById('loginPage').style.display = 'grid';
+                document.getElementById('loginForm').reset();
+                showNotification('success', 'Logout Berhasil!', 'Anda telah keluar dari sistem');
+            }
+        }
+
+        function showNotification(type, title, message) {
+            const notification = document.getElementById('notification');
+            const notifIcon = document.getElementById('notifIcon');
+            const notifTitle = document.getElementById('notifTitle');
+            const notifMessage = document.getElementById('notifMessage');
+
+            notifTitle.textContent = title;
+            notifMessage.textContent = message;
+
+            if (type === 'success') {
+                notifIcon.textContent = '✓';
+                notification.className = 'notification success show';
+            } else if (type === 'error') {
+                notifIcon.textContent = '✕';
+                notification.className = 'notification error show';
+            }
+
+            setTimeout(() => {
+                closeNotification();
+            }, 5000);
+        }
+
+        function closeNotification() {
+            const notification = document.getElementById('notification');
+            notification.classList.remove('show');
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            const selectedContent = document.getElementById(tabId);
+            if (selectedContent) {
+                selectedContent.classList.add('active');
+            }
+
+            const selectedTab = document.querySelector(`.tab[data-tab="${tabId}"]`);
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+            }
+
+            if (tabId === 'dashboard') {
+                updateDashboardStats();
+            } else if (tabId === 'data_pasien') {
+                setTimeout(loadDataPasien, 100);
+            } else if (tabId === 'input_snomed') {
+                setTimeout(loadSNOMEDCodes, 100);
+            } else if (tabId === 'input') {
+                setTimeout(() => { loadPatientSelect(); loadAllSNOMEDSelects(); }, 100);
+            } else if (tabId === 'database') {
+                setTimeout(loadDatabaseResume, 100);
+            } else if (tabId === 'mapping') {
+                setTimeout(updateMappingStats, 100);
+            }
+        }
+
+        function initializeDashboard() {
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            updateDashboardStats();
+            drawActivityChart();
+        }
+
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            };
+            const dateStr = now.toLocaleDateString('id-ID', options);
+            const timeStr = now.toLocaleTimeString('id-ID');
+
+            const dateElement = document.getElementById('currentDate');
+            const timeElement = document.getElementById('currentTime');
+            
+            if (dateElement) dateElement.textContent = dateStr;
+            if (timeElement) timeElement.textContent = timeStr;
+        }
+
+        function updateDashboardStats() {
+            const resumes = JSON.parse(localStorage.getItem('resumeData') || '[]');
+            const snomedCodes = JSON.parse(localStorage.getItem('snomedCodes') || '[]');
+            const patients = JSON.parse(localStorage.getItem('patients') || '[]');
+
+            document.getElementById('totalResume').textContent = resumes.length;
+            document.getElementById('totalMapped').textContent = resumes.length;
+            document.getElementById('totalSnomedCodes').textContent = snomedCodes.length;
+            document.getElementById('pendingReview').textContent = 0;
+
+            const mappingRate = resumes.length > 0 ? 100 : 0;
+            document.getElementById('mappingRate').textContent = `${mappingRate}% completion rate`;
+            
+            if (resumes.length > 0) {
+                document.getElementById('resumeGrowth').textContent = `↑ ${resumes.length} data tersimpan`;
+                document.getElementById('snomedStatus').textContent = snomedCodes.length > 0 ? 'Database aktif' : 'Belum ada kode';
+                document.getElementById('reviewStatus').textContent = 'Semua selesai';
+            } else {
+                document.getElementById('resumeGrowth').textContent = 'Belum ada data';
+                document.getElementById('snomedStatus').textContent = 'Belum ada kode';
+                document.getElementById('reviewStatus').textContent = 'Tidak ada yang pending';
+            }
+
+            const currentMonth = new Date().getMonth();
+            const monthlyResumes = resumes.filter(r => {
+                const resumeDate = new Date(r.tanggalMasuk);
+                return resumeDate.getMonth() === currentMonth;
+            });
+            document.getElementById('monthlyProductivity').textContent = monthlyResumes.length;
+
+            if (resumes.length > 0) {
+                document.getElementById('avgMappingTime').textContent = '8.5 menit';
+                document.getElementById('mappingAccuracy').textContent = '100%';
+            } else {
+                document.getElementById('avgMappingTime').textContent = '-';
+                document.getElementById('mappingAccuracy').textContent = '-';
+            }
+
+            updateTopDiagnoses(resumes);
+            updateStorageUsage();
+        }
+
+        function updateTopDiagnoses(resumes) {
+            const diagnosesList = document.getElementById('topDiagnoses');
+            
+            if (resumes.length === 0) {
+                diagnosesList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🏆</div>
+                        <h3>Belum Ada Data Diagnosa</h3>
+                        <p>Ranking akan muncul setelah ada data resume medis</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const diagnosisCount = {};
+            resumes.forEach(r => {
+                const diagnosis = r.diagnosaUtama;
+                diagnosisCount[diagnosis] = (diagnosisCount[diagnosis] || 0) + 1;
+            });
+
+            const sortedDiagnoses = Object.entries(diagnosisCount)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+
+            const maxCount = sortedDiagnoses[0]?.[1] || 1;
+            const colors = ['#e74c3c', '#3498db', '#9b59b6', '#27ae60', '#e67e22'];
+
+            diagnosesList.innerHTML = sortedDiagnoses.map((item, index) => {
+                const [diagnosis, count] = item;
+                const percentage = (count / resumes.length * 100).toFixed(1);
+                const width = (count / maxCount * 100);
+                
+                return `
+                    <div class="ranking-item">
+                        <div class="rank">${index + 1}</div>
+                        <div class="rank-content">
+                            <h4>${diagnosis}</h4>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: ${width}%; background: ${colors[index]};"></div>
+                            </div>
+                            <span class="count">${count} kasus (${percentage}%)</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateStorageUsage() {
+            const totalData = JSON.stringify(localStorage).length;
+            const maxStorage = 5242880;
+            const percentage = ((totalData / maxStorage) * 100).toFixed(1);
+            document.getElementById('storageUsage').textContent = `${percentage}% Terpakai`;
+        }
+
+        function drawActivityChart() {
+            const canvas = document.getElementById('activityChart');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            const resumes = JSON.parse(localStorage.getItem('resumeData') || '[]');
+            
+            const today = new Date();
+            const last7Days = [];
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                last7Days.push(date);
+            }
+
+            const data = last7Days.map(date => {
+                return resumes.filter(r => {
+                    const resumeDate = new Date(r.tanggalMasuk);
+                    return resumeDate.toDateString() === date.toDateString();
+                }).length;
+            });
+
+            const labels = last7Days.map(date => {
+                const days = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+                return days[date.getDay()];
+            });
+            
+            const padding = 40;
+            const chartWidth = canvas.width - padding * 2;
+            const chartHeight = canvas.height - padding * 2;
+            const barWidth = chartWidth / data.length;
+            const maxValue = Math.max(...data, 1);
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+            for (let i = 0; i <= 5; i++) {
+                const y = padding + (chartHeight / 5) * i;
+                ctx.beginPath();
+                ctx.moveTo(padding, y);
+                ctx.lineTo(canvas.width - padding, y);
+                ctx.stroke();
+
+                const value = Math.round(maxValue - (maxValue / 5) * i);
+                ctx.fillStyle = '#666';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'right';
+                ctx.fillText(value, padding - 10, y + 4);
+            }
+
+            data.forEach((value, index) => {
+                const barHeight = (value / maxValue) * chartHeight;
+                const x = padding + index * barWidth + barWidth * 0.2;
+                const y = canvas.height - padding - barHeight;
+                const width = barWidth * 0.6;
+
+                const gradient = ctx.createLinearGradient(x, y, x, canvas.height - padding);
+                gradient.addColorStop(0, '#27ae60');
+                gradient.addColorStop(1, '#1e8449');
+
+                ctx.fillStyle = gradient;
+                ctx.fillRect(x, y, width, barHeight);
+
+                if (value > 0) {
+                    ctx.fillStyle = '#333';
+                    ctx.font = 'bold 14px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(value, x + width / 2, y - 5);
+                }
+
+                ctx.fillStyle = '#666';
+                ctx.font = '12px Arial';
+                ctx.fillText(labels[index], x + width / 2, canvas.height - padding + 20);
+            });
+
+            ctx.fillStyle = '#333';
+            ctx.font = 'bold 14px Arial';
+            ctx.textAlign = 'left';
+            ctx.fillText('Jumlah Resume di-Mapping', padding, padding - 10);
+        }
+
+        function loadActivityLog() {
+            activityLog = JSON.parse(localStorage.getItem('activityLog') || '[]');
+            updateActivityList();
+        }
+
+        function addActivity(type, title, description) {
+            const activity = {
+                type,
+                title,
+                description,
+                timestamp: new Date().toISOString(),
+                user: currentUser?.name || 'User'
+            };
+            
+            activityLog.unshift(activity);
+            if (activityLog.length > 50) activityLog = activityLog.slice(0, 50);
+            
+            localStorage.setItem('activityLog', JSON.stringify(activityLog));
+            updateActivityList();
+        }
+
+        function updateActivityList() {
+            const activityListEl = document.getElementById('activityList');
+            
+            if (activityLog.length === 0) {
+                activityListEl.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">📭</div>
+                        <h3>Belum Ada Aktivitas</h3>
+                        <p>Aktivitas akan muncul setelah Anda mulai menggunakan sistem</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const icons = {
+                'resume': { icon: '👤', bg: '#e3f2fd' },
+                'mapping': { icon: '🔍', bg: '#f3e5f5' },
+                'patient': { icon: '👥', bg: '#e8f5e9' },
+                'snomed': { icon: '🔢', bg: '#fff3e0' }
+            };
+
+            activityListEl.innerHTML = activityLog.slice(0, 5).map(activity => {
+                const iconData = icons[activity.type] || { icon: 'ℹ️', bg: '#e0e0e0' };
+                const timeAgo = getTimeAgo(new Date(activity.timestamp));
+                
+                return `
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background: ${iconData.bg};">${iconData.icon}</div>
+                        <div class="activity-content">
+                            <h4>${activity.title}</h4>
+                            <p>${activity.description}</p>
+                            <span class="time">${timeAgo}</span>
+                        </div>
+                        <div class="activity-status success">✓ Selesai</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getTimeAgo(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            
+            if (seconds < 60) return 'Baru saja';
+            if (seconds < 3600) return `${Math.floor(seconds / 60)} menit yang lalu`;
+            if (seconds < 86400) return `${Math.floor(seconds / 3600)} jam yang lalu`;
+            return `${Math.floor(seconds / 86400)} hari yang lalu`;
+        }
+
+        const snomedDatabase = {
+            findings: [
+                { id: '289530006', display: 'Bleeding from vagina (finding)', value: 'Pendarahan vagina', category: 'finding' },
+                { id: '21522001', display: 'Abdominal pain (finding)', value: 'Nyeri perut', category: 'finding' },
+                { id: '271807003', display: 'Weakness (finding)', value: 'Lemah', category: 'finding' }
+            ],
+            disorders: [
+                { id: '71444005', display: 'Placenta previa (disorder)', value: 'Plasenta previa', category: 'disorder' },
+                { id: '38341003', display: 'Hypertension (disorder)', value: 'Hipertensi', category: 'disorder' },
+                { id: '73211009', display: 'Diabetes mellitus (disorder)', value: 'Diabetes melitus', category: 'disorder' }
+            ],
+            procedures: [
+                { id: '225158009', display: 'Intravenous therapy (procedure)', value: 'Pemasangan infus', category: 'procedure' },
+                { id: '116859006', display: 'Transfusion (procedure)', value: 'Transfusi darah', category: 'procedure' }
+            ]
+        };
+
+        function searchSNOMED() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const categoryFilter = document.getElementById('categoryFilter').value;
+            const searchResults = document.getElementById('searchResults');
+
+            if (searchInput.length < 2) {
+                searchResults.classList.remove('active');
+                return;
+            }
+
+            let allData = [];
+            Object.values(snomedDatabase).forEach(category => {
+                allData = allData.concat(category);
+            });
+
+            const userCodes = JSON.parse(localStorage.getItem('snomedCodes') || '[]');
+            userCodes.forEach(code => {
+                allData.push({
+                    id: code.kode,
+                    display: code.displayEnglish,
+                    value: code.displayIndonesia || '',
+                    category: code.kategori
+                });
+            });
+
+            if (categoryFilter) {
+                allData = allData.filter(item => item.category === categoryFilter);
+            }
+
+            const results = allData.filter(item => {
+                const searchStr = searchInput.toLowerCase();
+                return item.display.toLowerCase().includes(searchStr) ||
+                       item.value.toLowerCase().includes(searchStr) ||
+                       item.id.includes(searchStr);
+            });
+
+    if (results.length > 0) {
+        searchResults.innerHTML = results.slice(0, 10).map(item => `
+            <div class="search-item" onclick="selectSNOMED('${item.id.replace(/'/g, '\\\'')}', '${item.display.replace(/'/g, '\\\'')}', '${item.category}')">
+                <strong>${item.display}</strong>
+                <small>Kode: ${item.id}</small>
+                <div>
+                    <span class="badge badge-${item.category}">${item.category}</span>
+                </div>
+            </div>
+        `).join('');
+        searchResults.classList.add('active');
+    } else {
+        searchResults.innerHTML = '<div class="search-item">Tidak ada hasil ditemukan</div>';
+        searchResults.classList.add('active');
+    }
+        }
+
+        function selectSNOMED(id, display, category) {
+            showNotification('success', 'Kode Dipilih!', `${id} - ${display}`);
+            document.getElementById('searchResults').classList.remove('active');
+        }
+
+        function updateMappingStats() {
+            const snomedCodes = JSON.parse(localStorage.getItem('snomedCodes') || '[]');
+            
+            const findings = snomedCodes.filter(c => c.kategori === 'finding').length;
+            const procedures = snomedCodes.filter(c => c.kategori === 'procedure').length;
+            const disorders = snomedCodes.filter(c => c.kategori === 'disorder').length;
+            const substances = snomedCodes.filter(c => c.kategori === 'substance').length;
+
+            document.getElementById('countFindings').textContent = findings;
+            document.getElementById('countProcedures').textContent = procedures;
+            document.getElementById('countDisorders').textContent = disorders;
+            document.getElementById('countSubstances').textContent = substances;
+        }
+
+        function handlePendaftaran(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const editId = form.dataset.editId;
+
+            const formData = {
+                id: editId ? parseInt(editId) : Date.now(),
+                noRM: document.getElementById('noRM_pendaftaran').value,
+                tanggalPendaftaran: document.getElementById('tanggalPendaftaran').value,
+                namaLengkap: document.getElementById('namaLengkap').value,
+                jenisKelamin: document.getElementById('jenisKelamin_pendaftaran').value,
+                tanggalLahir: document.getElementById('tanggalLahir').value,
+                alamat: document.getElementById('alamat').value,
+                telepon: document.getElementById('telepon').value,
+                email: document.getElementById('email').value,
+                golonganDarah: document.getElementById('golonganDarah').value,
+                rhesus: document.getElementById('rhesus').value,
+                riwayatPenyakit: document.getElementById('riwayatPenyakit').value,
+                alergi: document.getElementById('alergi').value,
+                obatRutin: document.getElementById('obatRutin').value,
+                tanggalDaftar: new Date().toLocaleDateString('id-ID')
+            };
+
+            const birthDate = new Date(formData.tanggalLahir);
+            const today = new Date();
+            formData.usia = today.getFullYear() - birthDate.getFullYear();
+
+            let patients = JSON.parse(localStorage.getItem('patients') || '[]');
+            
+            if (editId) {
+                const index = patients.findIndex(p => p.id === parseInt(editId));
+                if (index !== -1) {
+                    patients[index] = formData;
+                    showNotification('success', 'Data Diperbarui!', `Data pasien ${formData.namaLengkap} berhasil diperbarui`);
+                    addActivity('patient', 'Data Pasien Diperbarui', `Pasien: ${formData.namaLengkap} (${formData.noRM})`);
+                }
+                delete form.dataset.editId;
+            } else {
+                patients.push(formData);
+                showNotification('success', 'Pasien Terdaftar!', `Pasien ${formData.namaLengkap} berhasil didaftarkan dengan No. RM ${formData.noRM}`);
+                addActivity('patient', 'Pasien Baru Terdaftar', `Pasien: ${formData.namaLengkap} (${formData.noRM})`);
+            }
+
+            localStorage.setItem('patients', JSON.stringify(patients));
+            document.getElementById('pendaftaranForm').reset();
+            updateDashboardStats();
+        }
+
+        function handleSubmitResume(event) {
+            event.preventDefault();
+
+            // PRIORITY 1: Validate patient exists before saving resume
+            const noRM = document.getElementById('noRM').value.trim();
+            const patients = JSON.parse(localStorage.getItem('patients') || '[]');
+            const patientExists = patients.find(p => p.noRM === noRM);
+
+            if (!patientExists) {
+                showNotification('error', 'Pasien Tidak Ditemukan!', 'Nomor RM tidak terdaftar. Silakan daftarkan pasien terlebih dahulu.');
+                return;
+            }
+
+            const formData = {
+                id: Date.now(),
+                noRM: noRM,
+                tanggalMasuk: document.getElementById('tanggalMasuk').value,
+                namaPasien: document.getElementById('namaPasien').value,
+                jenisKelamin: document.getElementById('jenisKelamin').value,
+                usia: document.getElementById('usia').value,
+                keluhanUtama: document.getElementById('keluhanUtama').value,
+                diagnosaUtama: document.getElementById('diagnosaUtama').value,
+                statusKehamilan: document.getElementById('statusKehamilan').value,
+                keluhanTambahan: document.getElementById('keluhanTambahan').value,
+                riwayatPenyakitResume: document.getElementById('riwayatPenyakitResume').value,
+                kondisiDatang: document.getElementById('kondisiDatang').value,
+                tindakan: document.getElementById('tindakan').value,
+                hasilTindakan: document.getElementById('hasilTindakan').value,
+                diagnosaSekunder: document.getElementById('diagnosaSekunder').value,
+                obat: document.getElementById('obat').value,
+                rencana: document.getElementById('rencana').value,
+                prognosis: document.getElementById('prognosis').value,
+                // PRIORITY 1: Link with patient data
+                patientId: patientExists.id
+            };
+
+            let savedData = JSON.parse(localStorage.getItem('resumeData') || '[]');
+            savedData.push(formData);
+            localStorage.setItem('resumeData', JSON.stringify(savedData));
+
+            showNotification('success', 'Data Tersimpan!', 'Resume medis berhasil disimpan dan siap untuk mapping');
+            addActivity('resume', 'Resume Medis Ditambahkan', `Pasien: ${formData.namaPasien} (${formData.noRM}) - ${formData.diagnosaUtama}`);
+
+            setTimeout(() => {
+                document.getElementById('resumeForm').reset();
+                updateDashboardStats();
+                drawActivityChart();
+            }, 1500);
+        }
+
+        function handleInputSNOMED(event) {
+            event.preventDefault();
+
+            const snomedData = {
+                id: Date.now(),
+                kode: document.getElementById('kodeSNOMED').value,
+                kategori: document.getElementById('kategoriSNOMED').value,
+                displayEnglish: document.getElementById('displayEnglish').value,
+                displayIndonesia: document.getElementById('displayIndonesia').value,
+                deskripsi: document.getElementById('deskripsiSNOMED').value
+            };
+
+            let snomedCodes = JSON.parse(localStorage.getItem('snomedCodes') || '[]');
+            snomedCodes.push(snomedData);
+            localStorage.setItem('snomedCodes', JSON.stringify(snomedCodes));
+
+            showNotification('success', 'Kode SNOMED-CT Ditambahkan!', `Kode ${snomedData.kode} berhasil disimpan`);
+            addActivity('snomed', 'Kode SNOMED-CT Ditambahkan', `Kode: ${snomedData.kode} - ${snomedData.displayEnglish}`);
+
+            document.getElementById('snomedForm').reset();
+            loadSNOMEDCodes();
+            updateDashboardStats();
+        }
+
+        function loadDataPasien() {
+            const patients = JSON.parse(localStorage.getItem('patients') || '[]');
+            const tbody = document.getElementById('dataPasienBody');
+
+            if (patients.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" style="text-align: center; padding: 40px;">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">👥</div>
+                                <h3>Belum Ada Data Pasien</h3>
+                                <p>Silakan tambahkan pasien baru di menu Pendaftaran Pasien</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = patients.map((patient, index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${patient.noRM}</td>
+                    <td>${patient.namaLengkap}</td>
+                    <td>${patient.jenisKelamin}</td>
+                    <td>${patient.usia} tahun</td>
+                    <td>${patient.telepon || '-'}</td>
+                    <td>${patient.tanggalDaftar}</td>
+                    <td>
+                        <button class="btn-small btn-view" onclick="viewPasienDetail(${patient.id})">👁️ Lihat</button>
+                        <button class="btn-small" onclick="editPasien(${patient.id})">✏️ Edit</button>
+                        <button class="btn-small delete-btn" onclick="deletePasien(${patient.id})">🗑️ Hapus</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function loadSNOMEDCodes() {
+            const snomedCodes = JSON.parse(localStorage.getItem('snomedCodes') || '[]');
+            const tbody = document.getElementById('snomedTableBody');
+
+            if (snomedCodes.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 40px;">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🔢</div>
+                                <h3>Belum Ada Kode SNOMED-CT</h3>
+                                <p>Silakan tambahkan kode baru menggunakan form di atas</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = snomedCodes.map(code => `
+                <tr>
+                    <td>${code.kode}</td>
+                    <td>${code.displayEnglish}</td>
+                    <td>${code.displayIndonesia || '-'}</td>
+                    <td><span class="badge badge-${code.kategori}">${code.kategori}</span></td>
+                    <td>
+                        <button class="btn-small btn-view" onclick="viewSNOMEDDetail('${code.kode}', '${code.displayEnglish}', '${code.displayIndonesia || ''}', '${code.kategori}', '${code.deskripsi || ''}')">👁️ Lihat</button>
+                        <button class="btn-small delete-btn" onclick="deleteSNOMED(${code.id})">🗑️ Hapus</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function loadDatabaseResume() {
+            const resumes = JSON.parse(localStorage.getItem('resumeData') || '[]');
+            const tbody = document.getElementById('databaseBody');
+
+            if (resumes.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px;">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">💾</div>
+                                <h3>Belum Ada Resume Medis</h3>
+                                <p>Silakan tambahkan resume baru di menu Input Resume</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = resumes.map((resume, index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${resume.noRM}</td>
+                    <td>${resume.namaPasien}</td>
+                    <td>${new Date(resume.tanggalMasuk).toLocaleDateString('id-ID')}</td>
+                    <td>${resume.diagnosaUtama}</td>
+                    <td><span class="activity-status success">✓ Selesai</span></td>
+                    <td>
+                        <button class="btn-small btn-view" onclick="viewResumeDetail(${index})">👁️ Lihat</button>
+                        <button class="btn-small delete-btn" onclick="deleteResume(${index})">🗑️ Hapus</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function viewPasienDetail(id) {
+            const patients = JSON.parse(localStorage.getItem('patients') || '[]');
+            const patient = patients.find(p => p.id === id);
+
+            if (!patient) {
+                showNotification('error', 'Error', 'Data pasien tidak ditemukan');
+                return;
+            }
+
+            const detailHTML = `
+                <div style="background: white; padding: 30px; border-radius: 15px; max-width: 800px; margin: 20px auto; box-shadow: 0 5px 20px rgba(0,0,0,0.2);">
+                    <h2 style="color: #27ae60; margin-bottom: 20px; text-align: center;">👤 Detail Pasien</h2>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div>
+                            <h3 style="color: #27ae60; margin-bottom: 15px; font-size: 1.2em;">📋 Data Administratif</h3>
+                            <p><strong>No. RM:</strong> ${patient.noRM}</p>
+                            <p><strong>Tanggal Pendaftaran:</strong> ${patient.tanggalPendaftaran || patient.tanggalDaftar}</p>
+                            <p><strong>Nama Lengkap:</strong> ${patient.namaLengkap}</p>
+                            <p><strong>Jenis Kelamin:</strong> ${patient.jenisKelamin}</p>
+                            <p><strong>Tanggal Lahir:</strong> ${patient.tanggalLahir}</p>
+                            <p><strong>Usia:</strong> ${patient.usia} tahun</p>
+                        </div>
+                        <div>
+                            <h3 style="color: #27ae60; margin-bottom: 15px; font-size: 1.2em;">📞 Kontak & Alamat</h3>
+                            <p><strong>Telepon:</strong> ${patient.telepon || '-'}</p>
+                            <p><strong>Email:</strong> ${patient.email || '-'}</p>
+                            <p><strong>Alamat:</strong> ${patient.alamat || '-'}</p>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="color: #27ae60; margin-bottom: 15px; font-size: 1.2em;">🏥 Data Medis Dasar</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div>
+                                <p><strong>Golongan Darah:</strong> ${patient.golonganDarah || '-'}</p>
+                                <p><strong>Rhesus:</strong> ${patient.rhesus || '-'}</p>
+                            </div>
+                            <div>
+                                <p><strong>Riwayat Penyakit:</strong> ${patient.riwayatPenyakit || '-'}</p>
+                                <p><strong>Alergi:</strong> ${patient.alergi || '-'}</p>
+                                <p><strong>Obat Rutin:</strong> ${patient.obatRutin || '-'}</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="btn btn-primary" onclick="closeModal()">✓ Tutup</button>
+                    </div>
+                </div>
+            `;
+
+            showModal(detailHTML);
+        }
+
+        function viewSNOMEDDetail(kode, displayEng, displayInd, kategori, deskripsi = '') {
+            const detailHTML = `
+                <div style="background: white; padding: 30px; border-radius: 15px; max-width: 600px; margin: 20px auto; box-shadow: 0 5px 20px rgba(0,0,0,0.2);">
+                    <h2 style="color: #27ae60; margin-bottom: 20px; text-align: center;">🔢 Detail Kode SNOMED-CT</h2>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <p style="margin-bottom: 10px;"><strong>Kode:</strong> <span style="color: #27ae60; font-size: 1.2em;">${kode}</span></p>
+                        <p style="margin-bottom: 10px;"><strong>Display (English):</strong> ${displayEng}</p>
+                        <p style="margin-bottom: 10px;"><strong>Display (Indonesia):</strong> ${displayInd || '-'}</p>
+                        <p style="margin-bottom: 10px;"><strong>Kategori:</strong> <span class="badge badge-${kategori}">${kategori}</span></p>
+                        ${deskripsi ? `<p style="margin-bottom: 10px;"><strong>Deskripsi:</strong> ${deskripsi}</p>` : ''}
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="btn btn-primary" onclick="closeModal()">✓ Tutup</button>
+                    </div>
+                </div>
+            `;
+
+            showModal(detailHTML);
+        }
+
+        function viewResumeDetail(index) {
+            const resumes = JSON.parse(localStorage.getItem('resumeData') || '[]');
+            const resume = resumes[index];
+
+            if (!resume) {
+                showNotification('error', 'Error', 'Data resume tidak ditemukan');
+                return;
+            }
+
+            const detailHTML = `
+                <div style="background: white; padding: 30px; border-radius: 15px; max-width: 800px; margin: 20px auto; box-shadow: 0 5px 20px rgba(0,0,0,0.2); max-height: 80vh; overflow-y: auto;">
+                    <h2 style="color: #27ae60; margin-bottom: 20px; text-align: center;">📋 Detail Resume Medis</h2>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="color: #27ae60; margin-bottom: 15px;">📋 Data Administratif</h3>
+                        <p><strong>No. RM:</strong> ${resume.noRM}</p>
+                        <p><strong>Tanggal Masuk:</strong> ${new Date(resume.tanggalMasuk).toLocaleString('id-ID')}</p>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="color: #27ae60; margin-bottom: 15px;">👤 Data Pasien</h3>
+                        <p><strong>Nama:</strong> ${resume.namaPasien}</p>
+                        <p><strong>Jenis Kelamin:</strong> ${resume.jenisKelamin}</p>
+                        <p><strong>Usia:</strong> ${resume.usia} tahun</p>
+                        ${resume.statusKehamilan ? `<p><strong>Status Kehamilan:</strong> ${resume.statusKehamilan}</p>` : ''}
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="color: #27ae60; margin-bottom: 15px;">🩺 Keluhan dan Diagnosa</h3>
+                        <p><strong>Keluhan Utama:</strong> ${resume.keluhanUtama}</p>
+                        ${resume.keluhanTambahan ? `<p><strong>Keluhan Tambahan:</strong> ${resume.keluhanTambahan}</p>` : ''}
+                        <p><strong>Diagnosa Utama:</strong> ${resume.diagnosaUtama}</p>
+                        ${resume.diagnosaSekunder ? `<p><strong>Diagnosa Sekunder:</strong> ${resume.diagnosaSekunder}</p>` : ''}
+                    </div>
+                    
+                    ${resume.tindakan ? `
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="color: #27ae60; margin-bottom: 15px;">⚕️ Tindakan</h3>
+                        <p><strong>Tindakan:</strong> ${resume.tindakan}</p>
+                        ${resume.hasilTindakan ? `<p><strong>Hasil:</strong> ${resume.hasilTindakan}</p>` : ''}
+                    </div>
+                    ` : ''}
+                    
+                    ${resume.obat ? `
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="color: #27ae60; margin-bottom: 15px;">💊 Obat</h3>
+                        <p>${resume.obat}</p>
+                    </div>
+                    ` : ''}
+                    
+                    ${resume.rencana || resume.prognosis ? `
+                    <div style="margin-bottom: 20px;">
+                        <h3 style="color: #27ae60; margin-bottom: 15px;">📋 Rencana</h3>
+                        ${resume.rencana ? `<p><strong>Tindak Lanjut:</strong> ${resume.rencana}</p>` : ''}
+                        ${resume.prognosis ? `<p><strong>Prognosis:</strong> ${resume.prognosis}</p>` : ''}
+                    </div>
+                    ` : ''}
+                    
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="btn btn-primary" onclick="closeModal()">✓ Tutup</button>
+                    </div>
+                </div>
+            `;
+
+            showModal(detailHTML);
+        }
+
+        function showModal(content) {
+            const modal = document.createElement('div');
+            modal.id = 'detailModal';
+            modal.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; justify-content: center; align-items: center; overflow-y: auto; padding: 20px;';
+            modal.innerHTML = content;
+            document.body.appendChild(modal);
+
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('detailModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        function editPasien(id) {
+            const patients = JSON.parse(localStorage.getItem('patients') || '[]');
+            const patient = patients.find(p => p.id === id);
+
+            if (!patient) {
+                showNotification('error', 'Error', 'Data pasien tidak ditemukan');
+                return;
+            }
+
+            switchTab('pendaftaran');
+
+            setTimeout(() => {
+                document.getElementById('noRM_pendaftaran').value = patient.noRM;
+                document.getElementById('tanggalPendaftaran').value = patient.tanggalPendaftaran || '';
+                document.getElementById('namaLengkap').value = patient.namaLengkap;
+                document.getElementById('jenisKelamin_pendaftaran').value = patient.jenisKelamin;
+                document.getElementById('tanggalLahir').value = patient.tanggalLahir;
+                document.getElementById('alamat').value = patient.alamat || '';
+                document.getElementById('telepon').value = patient.telepon || '';
+                document.getElementById('email').value = patient.email || '';
+                document.getElementById('golonganDarah').value = patient.golonganDarah || '';
+                document.getElementById('rhesus').value = patient.rhesus || '';
+                document.getElementById('riwayatPenyakit').value = patient.riwayatPenyakit || '';
+                document.getElementById('alergi').value = patient.alergi || '';
+                document.getElementById('obatRutin').value = patient.obatRutin || '';
+
+                document.getElementById('pendaftaranForm').dataset.editId = id;
+                
+                showNotification('info', 'Mode Edit', 'Silakan ubah data dan klik Simpan');
+            }, 100);
+        }
+
+        function deletePasien(id) {
+            if (!confirm('Apakah Anda yakin ingin menghapus data pasien ini?')) {
+                return;
+            }
+
+            let patients = JSON.parse(localStorage.getItem('patients') || '[]');
+            const patient = patients.find(p => p.id === id);
+            patients = patients.filter(p => p.id !== id);
+            localStorage.setItem('patients', JSON.stringify(patients));
+
+            showNotification('success', 'Data Dihapus!', 'Data pasien berhasil dihapus');
+            if (patient) {
+                addActivity('patient', 'Data Pasien Dihapus', `Pasien: ${patient.namaLengkap} (${patient.noRM})`);
+            }
+            loadDataPasien();
+            updateDashboardStats();
+        }
+
+        function deleteSNOMED(id) {
+            if (!confirm('Apakah Anda yakin ingin menghapus kode SNOMED ini?')) {
+                return;
+            }
+
+            let snomedCodes = JSON.parse(localStorage.getItem('snomedCodes') || '[]');
+            const code = snomedCodes.find(s => s.id === id);
+            snomedCodes = snomedCodes.filter(s => s.id !== id);
+            localStorage.setItem('snomedCodes', JSON.stringify(snomedCodes));
+
+            showNotification('success', 'Kode Dihapus!', `Kode berhasil dihapus`);
+            if (code) {
+                addActivity('snomed', 'Kode SNOMED-CT Dihapus', `Kode: ${code.kode} - ${code.displayEnglish}`);
+            }
+            loadSNOMEDCodes();
+            updateDashboardStats();
+        }
+
+        function deleteResume(index) {
+            if (!confirm('Apakah Anda yakin ingin menghapus resume ini?')) {
+                return;
+            }
+
+            let resumes = JSON.parse(localStorage.getItem('resumeData') || '[]');
+            const resume = resumes[index];
+            resumes.splice(index, 1);
+            localStorage.setItem('resumeData', JSON.stringify(resumes));
+
+            showNotification('success', 'Resume Dihapus!', 'Resume medis berhasil dihapus');
+            if (resume) {
+                addActivity('resume', 'Resume Medis Dihapus', `Pasien: ${resume.namaPasien} (${resume.noRM})`);
+            }
+            loadDatabaseResume();
+            updateDashboardStats();
+            drawActivityChart();
+        }
+
+        function refreshDatabase() {
+            loadDatabaseResume();
+            showNotification('success', 'Database Diperbarui!', 'Data berhasil di-refresh');
+        }
+
+        function refreshDataPasien() {
+            loadDataPasien();
+            showNotification('success', 'Data Pasien Diperbarui!', 'Data berhasil di-refresh');
+        }
+
+        function exportToExcel() {
+            const resumes = JSON.parse(localStorage.getItem('resumeData') || '[]');
+            if (resumes.length === 0) {
+                showNotification('error', 'Tidak Ada Data', 'Belum ada data untuk di-export');
+                return;
+            }
+
+            // Create CSV content
+            const headers = [
+                'No. RM', 'Nama Pasien', 'Jenis Kelamin', 'Usia', 'Tanggal Masuk',
+                'Keluhan Utama', 'Diagnosa Utama', 'Diagnosa Sekunder', 'Tindakan',
+                'Hasil Tindakan', 'Obat', 'Rencana', 'Prognosis'
+            ];
+
+            const csvContent = [
+                headers.join(','),
+                ...resumes.map(resume => [
+                    resume.noRM,
+                    `"${resume.namaPasien}"`,
+                    resume.jenisKelamin,
+                    resume.usia,
+                    new Date(resume.tanggalMasuk).toLocaleDateString('id-ID'),
+                    `"${resume.keluhanUtama}"`,
+                    `"${resume.diagnosaUtama}"`,
+                    `"${resume.diagnosaSekunder || ''}"`,
+                    `"${resume.tindakan || ''}"`,
+                    `"${resume.hasilTindakan || ''}"`,
+                    `"${resume.obat || ''}"`,
+                    `"${resume.rencana || ''}"`,
+                    `"${resume.prognosis || ''}"`
+                ].join(','))
+            ].join('\n');
+
+            // Download CSV file
+            downloadFile(csvContent, 'resume_medis.csv', 'text/csv');
+            showNotification('success', 'Export Berhasil!', `${resumes.length} data berhasil di-export ke CSV`);
+        }
+
+        function exportToPDF() {
+            const resumes = JSON.parse(localStorage.getItem('resumeData') || '[]');
+            if (resumes.length === 0) {
+                showNotification('error', 'Tidak Ada Data', 'Belum ada data untuk di-export');
+                return;
+            }
+
+            // Export as JSON (PDF generation would require additional libraries)
+            const jsonContent = JSON.stringify(resumes, null, 2);
+            downloadFile(jsonContent, 'resume_medis.json', 'application/json');
+            showNotification('success', 'Export Berhasil!', `${resumes.length} data berhasil di-export ke JSON`);
+        }
+
+        function exportDataPasien() {
+            const patients = JSON.parse(localStorage.getItem('patients') || '[]');
+            if (patients.length === 0) {
+                showNotification('error', 'Tidak Ada Data', 'Belum ada data pasien untuk di-export');
+                return;
+            }
+
+            // Create CSV content for patients
+            const headers = [
+                'No. RM', 'Nama Lengkap', 'Jenis Kelamin', 'Tanggal Lahir', 'Usia',
+                'Telepon', 'Email', 'Alamat', 'Golongan Darah', 'Rhesus',
+                'Riwayat Penyakit', 'Alergi', 'Obat Rutin', 'Tanggal Daftar'
+            ];
+
+            const csvContent = [
+                headers.join(','),
+                ...patients.map(patient => [
+                    patient.noRM,
+                    `"${patient.namaLengkap}"`,
+                    patient.jenisKelamin,
+                    patient.tanggalLahir,
+                    patient.usia,
+                    `"${patient.telepon || ''}"`,
+                    `"${patient.email || ''}"`,
+                    `"${patient.alamat || ''}"`,
+                    `"${patient.golonganDarah || ''}"`,
+                    `"${patient.rhesus || ''}"`,
+                    `"${patient.riwayatPenyakit || ''}"`,
+                    `"${patient.alergi || ''}"`,
+                    `"${patient.obatRutin || ''}"`,
+                    patient.tanggalDaftar
+                ].join(','))
+            ].join('\n');
+
+            // Download CSV file
+            downloadFile(csvContent, 'data_pasien.csv', 'text/csv');
+            showNotification('success', 'Export Berhasil!', `${patients.length} data pasien berhasil di-export ke CSV`);
+        }
+
+        function downloadFile(content, filename, mimeType) {
+            const blob = new Blob([content], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // PRIORITY 2: Patient dropdown and auto-fill functions
+        function loadPatientSelect() {
+            const patients = JSON.parse(localStorage.getItem('patients') || '[]');
+            const select = document.getElementById('patientSelect');
+
+            select.innerHTML = '<option value="">Pilih pasien...</option>';
+
+            patients.forEach(patient => {
+                const option = document.createElement('option');
+                option.value = patient.noRM;
+                option.textContent = `${patient.noRM} - ${patient.namaLengkap}`;
+                select.appendChild(option);
+            });
+        }
+
+        // INTEGRATION: Load SNOMED-CT master data into select dropdowns
+        function loadSNOMEDIntoSelect(selectId) {
+            const snomedCodes = JSON.parse(localStorage.getItem('snomedCodes') || '[]');
+            const select = document.getElementById(selectId);
+
+            if (!select) return;
+
+            select.innerHTML = '<option value="">Pilih kode SNOMED-CT...</option>';
+
+            snomedCodes.forEach(code => {
+                const option = document.createElement('option');
+                option.value = code.kode;
+                option.textContent = `${code.kode} - ${code.displayEnglish}`;
+                option.dataset.display = code.displayEnglish;
+                option.dataset.indonesia = code.displayIndonesia || '';
+                option.dataset.kategori = code.kategori;
+                select.appendChild(option);
+            });
+        }
+
+        // Load all SNOMED selects in the Input Resume tab
+        function loadAllSNOMEDSelects() {
+            const snomedSelectIds = [
+                'snomedSelect',
+                'statusKehamilanSNOMED',
+                'keluhanUtamaSNOMED',
+                'keluhanTambahanSNOMED',
+                'riwayatPenyakitSNOMED',
+                'kondisiDatangSNOMED'
+            ];
+
+            snomedSelectIds.forEach(selectId => {
+                loadSNOMEDIntoSelect(selectId);
+            });
+        }
+
+        // INTEGRATION: Load SNOMED-CT master data for selection in resume form
+        // Loads only previously registered SNOMED codes from localStorage master data
+        function loadSNOMEDSelect() {
+            const snomedCodes = JSON.parse(localStorage.getItem('snomedCodes') || '[]');
+            const select = document.getElementById('snomedSelect');
+
+            select.innerHTML = '<option value="">Pilih kode SNOMED-CT...</option>';
+
+            snomedCodes.forEach(code => {
+                const option = document.createElement('option');
+                option.value = code.kode;
+                option.textContent = `${code.kode} - ${code.displayEnglish}`;
+                option.dataset.display = code.displayEnglish;
+                option.dataset.indonesia = code.displayIndonesia || '';
+                select.appendChild(option);
+            });
+        }
+
+        // INTEGRATION: Auto-fill diagnosis when SNOMED code is selected
+        // Prevents manual typing, ensures data integrity with master data
+        function onSNOMEDSelect() {
+            const select = document.getElementById('snomedSelect');
+            const selectedOption = select.options[select.selectedIndex];
+            const diagnosaField = document.getElementById('diagnosaUtama');
+
+            if (selectedOption.value) {
+                // Auto-fill with English display name (can be modified to use Indonesian if preferred)
+                diagnosaField.value = selectedOption.dataset.display;
+            } else {
+                diagnosaField.value = '';
+            }
+        }
+
+        function onPatientSelect() {
+            const selectedNoRM = document.getElementById('patientSelect').value;
+            const patients = JSON.parse(localStorage.getItem('patients') || '[]');
+            const patient = patients.find(p => p.noRM === selectedNoRM);
+
+            if (patient) {
+                // Auto-fill patient details
+                document.getElementById('noRM').value = patient.noRM;
+                document.getElementById('namaPasien').value = patient.namaLengkap;
+                document.getElementById('jenisKelamin').value = patient.jenisKelamin;
+                document.getElementById('usia').value = patient.usia;
+            } else {
+                // Clear fields if no patient selected
+                document.getElementById('noRM').value = '';
+                document.getElementById('namaPasien').value = '';
+                document.getElementById('jenisKelamin').value = '';
+                document.getElementById('usia').value = '';
+            }
+        }
+
+        document.addEventListener('click', function(event) {
+            const searchBox = document.querySelector('.search-box');
+            const searchResults = document.getElementById('searchResults');
+            if (searchBox && !searchBox.contains(event.target)) {
+                if (searchResults) {
+                    searchResults.classList.remove('active');
+                }
+            }
+        }); // Fixed missing closing parenthesis and semicolon for addEventListener
+    </script>
+</body>
+</html>
